@@ -1,30 +1,63 @@
-import React, { useState } from 'react'
+import React, { useState ,useContext} from 'react'
 import './booking.css'
 import { Button, Form, FormGroup,ListGroup,ListGroupItem } from 'reactstrap'
-import { useNavigate,Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
+import { BASE_URL } from '../../utils/config';
 
 const Booking = ({tour, avgRating}) => {
-    const{price,reviews}= tour;
+    const{price,reviews,title}= tour;
     const navigate = useNavigate();
 
+    const {user} = useContext(AuthContext)
 
-    const [credentials,setCredentials]= useState({
-        userID: '01', //later it will be dynamic
-        userEmail: 'example@gmail.com',
+    const [booking,setBooking]= useState({
+        userID: user && user._id, //later it will be dynamic
+        userEmail: user && user.email,
+        tourName:title,
         fullName:'',
         phone:'',
         guestSize:1,
         bookAt:''
     })
     const handleChange = e =>{
-        setCredentials(prev=>({...prev,[e.target.id]:e.target.value}))
+        setBooking(prev=>({...prev,[e.target.id]:e.target.value}))
     };
 
     const serviceFee =10
-    const totalCost = Number(price) * Number(credentials.guestSize) + Number(serviceFee)
-    const handleClick = e =>{
+    const totalCost = 
+    Number(price) * Number(booking.guestSize) + Number(serviceFee)
+    
+    const handleClick = async e =>{
         e.preventDefault();
-       navigate('/thank-you')
+
+console.log(booking);
+
+
+        try {
+            if(!user || user===null){
+                return alert('Place sign in')
+            }
+            const res = await fetch(`${BASE_URL}/book`, {
+                method: 'POST',
+                credentials: 'include', // Include credentials (cookies)
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body:JSON.stringify(booking)
+            })
+            const result = await res.json()
+
+            if(!res.ok){
+                return alert(result.message)
+            }
+            navigate('/thank-you')
+
+        } catch (err) {
+            alert(err.message)
+        }
+
+      
         
     }
 
@@ -77,9 +110,7 @@ const Booking = ({tour, avgRating}) => {
         <span>${totalCost}</span>
     </ListGroupItem>
     </ListGroup>
-    <Button className="btn primary__btn w-100 mt-4">
-       <Link to='/thank-you'>Book Now</Link>
-    </Button>
+<Button className="btn primary__btn w-100 mt-4" onClick={handleClick}>Book Now</Button>
 </div>
    </div>
   )

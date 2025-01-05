@@ -9,6 +9,7 @@ import SearchResultList from '../pages/SearchResultList'
 import ThankYou from '../pages/ThankYou'
 import Gallery from '../pages/Gallery'
 import About from '../pages/About'
+import Payment from '../pages/Payment'
 
 
 const Routers = () => {
@@ -25,6 +26,7 @@ const Routers = () => {
         <Route path='/tours/search' element={<SearchResultList/>}/>
         <Route path='/gallery' element={<Gallery/>}/>
         <Route path='/about' element={<About/>}/>
+        <Route path='/payment' element={<Payment/>}/>
      </Routes>
     </div>
   )
